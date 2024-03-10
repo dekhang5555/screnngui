@@ -1,0 +1,118 @@
+-- Gui to Lua
+-- Version: 3.2
+
+-- Instances:
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextButton = Instance.new("TextButton")
+
+--Properties:
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.223943666, 0, 0.0552070253, 0)
+Frame.Size = UDim2.new(0, 281, 0, 341)
+
+TextButton.Parent = ScreenGui
+TextButton.BackgroundColor3 = Color3.fromRGB(255, 0, 4)
+TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.0239436626, 0, 0.550815582, 0)
+TextButton.Size = UDim2.new(0, 88, 0, 50)
+TextButton.Font = Enum.Font.SourceSans
+TextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.TextSize = 14.000
+
+-- Scripts:
+
+local function GSRA_fake_script() -- ScreenGui.LocalScript 
+	local script = Instance.new('LocalScript', ScreenGui)
+
+	-- Lấy đối tượng TextButton và GUI
+	local textButton = script.Parent:WaitForChild("TextButton")
+	local guiFrame = script.Parent:WaitForChild("Frame")
+	
+	-- Biến để kiểm tra trạng thái của GUI
+	local isGuiVisible = false
+	
+	-- Hàm xử lý khi nhấn vào nút TextButton
+	local function onButtonClick()
+		isGuiVisible = not isGuiVisible
+		guiFrame.Visible = isGuiVisible
+	end
+	
+	-- Kết nối hàm với sự kiện MouseButton1Click
+	textButton.MouseButton1Click:Connect(onButtonClick)
+	
+end
+coroutine.wrap(GSRA_fake_script)()
+local function WBUOYF_fake_script() -- ScreenGui.LocalScript 
+	local script = Instance.new('LocalScript', ScreenGui)
+
+	-- Lấy đối tượng Frame
+	local draggableFrame = script.Parent:WaitForChild("Frame")
+	
+	-- Biến để kiểm tra trạng thái kéo thả
+	local isDragging = false
+	
+	-- Biến để lưu vị trí ban đầu của chuột khi bắt đầu kéo
+	local initialMousePos = nil
+	local initialFramePos = nil
+	
+	-- Lấy dịch vụ UserInputService
+	local userInputService = game:GetService("UserInputService")
+	
+	-- Hàm xử lý khi chuột được nhấn
+	local function onMouseDown(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			isDragging = true
+			initialMousePos = input.Position
+			initialFramePos = draggableFrame.Position
+	
+			-- Chặn sự kiện chuột để không tương tác với các đối tượng khác
+			userInputService.InputChanged:Connect(function(newInput)
+				if newInput.UserInputType == Enum.UserInputType.MouseMovement then
+					input = newInput
+				end
+			end)
+		end
+	end
+	
+	-- Hàm xử lý khi chuột được di chuyển
+	local function onMouseMove(input)
+		if isDragging then
+			local delta = input.Position - initialMousePos
+			local newPosition = UDim2.new(
+				initialFramePos.X.Scale,
+				initialFramePos.X.Offset + delta.X,
+				initialFramePos.Y.Scale,
+				initialFramePos.Y.Offset + delta.Y
+			)
+	
+			draggableFrame.Position = newPosition
+		end
+	end
+	
+	-- Hàm xử lý khi chuột được thả ra
+	local function onMouseUp()
+		isDragging = false
+		initialMousePos = nil
+		initialFramePos = nil
+	
+		-- Ngừng theo dõi sự kiện chuột khi thả ra
+		userInputService.InputChanged:Disconnect()
+	end
+	
+	-- Kết nối hàm với sự kiện chuột
+	draggableFrame.InputBegan:Connect(onMouseDown)
+	draggableFrame.InputChanged:Connect(onMouseMove)
+	draggableFrame.InputEnded:Connect(onMouseUp)
+	
+end
+coroutine.wrap(WBUOYF_fake_script)()
